@@ -1,0 +1,9 @@
+[submodule "vim/.vim/pack/my-plugins/start/vim-airline"]
+	path = vim/.vim/pack/my-plugins/start/vim-airline
+	url = https://github.com/vim-airline/vim-airline.git
+[submodule "vim/.vim/pack/my-plugins/start/vim-obsession"]
+	path = vim/.vim/pack/my-plugins/start/vim-obsession
+	url = https://github.com/tpope/vim-obsession.git
+[submodule "vim/.vim/pack/my-plugins/start/vim-unimpaired"]
+	path = vim/.vim/pack/my-plugins/start/vim-unimpaired
+	url = https://github.com/tpope/vim-unimpaired.git

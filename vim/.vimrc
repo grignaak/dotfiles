@@ -11,7 +11,8 @@ set shiftwidth=4 tabstop=4 expandtab smarttab shiftround
 set sessionoptions-=options
 filetype off
 
-execute pathogen#infect()
+"execute pathogen#infect()
+packadd matchit
 
 syntax on
 filetype plugin indent on
