@@ -1,0 +1,10 @@
+---
+integration-branches:
+- heads/mainline
+- heads/1.1-gradle
+- heads/1.0-happiertrails
+- heads/master
+- heads/next
+- heads/edge
+ignore: []
+max_commits: 5

@@ -1,0 +1,10 @@
+generated
+generated_tests
+*.iml
+build
+annotation-generated-src/
+annotation-generated-tst/
+*.sw*
+*.DS_Store
+.gradle
+Session.vim

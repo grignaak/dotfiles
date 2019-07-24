@@ -1,0 +1,37 @@
+[user]
+    email = mdearde@amazon.com
+    name = Michael Deardeuff
+[color]
+    ui = true
+	status = always
+[core]
+    pager = less -FMRiX
+    excludesfile = /Users/mdearde/.gitignore_global
+[push]
+    default = simple
+[alias]
+    st = status
+    addu = add -u
+    amend = commit --amend -C HEAD
+    hist = log --pretty=format:'%h %ad |%C(red)%d%C(reset) %s [%an]' --graph --date=short --branches --tags --remotes -n 30
+    feature = checkout --track origin/mainline -b
+
+    dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)%an <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+    history = log --pretty=format:'%h %ad |%C(red)%d%C(reset) %s [%an] ' --graph --date=short --all
+    recent = log --pretty=format:'%h %ar |%C(red)%d%C(reset) %s [%an]' --graph --date=short --all -n 15 --since=1.month.ago
+    type = cat-file -t
+    dump = cat-file -p
+[amazon]
+    append-cr-url = true
+    pull-request-by-default = false
+[pull]
+    rebase = true
+[merge]
+    tool = p4merge
+[mergetool]
+    prompt = false
+    keepBackup = false
+[mergetool "p4merge"]
+    path = /Users/mdearde/bin/p4merge
+[git-town]
+    offline = true
