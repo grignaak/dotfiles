@@ -7,3 +7,6 @@
 [submodule "vim/.vim/pack/my-plugins/start/vim-unimpaired"]
 	path = vim/.vim/pack/my-plugins/start/vim-unimpaired
 	url = https://github.com/tpope/vim-unimpaired.git
+[submodule "vim/.vim/pack/my-plugins/start/vim-gitgutter"]
+	path = vim/.vim/pack/my-plugins/start/vim-gitgutter
+	url = https://github.com/airblade/vim-gitgutter.git

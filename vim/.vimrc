@@ -11,8 +11,12 @@ set shiftwidth=4 tabstop=4 expandtab smarttab shiftround
 set sessionoptions-=options
 filetype off
 
-"execute pathogen#infect()
 packadd matchit
+
+" vim on the NAS doesn't have signs
+if has('signs')
+    packadd 'vim-gitgutter'
+endif
 
 syntax on
 filetype plugin indent on
@@ -24,7 +28,7 @@ set relativenumber
 set wildmenu lazyredraw
 
 " a nice status line
-set statusline=%F%m%r%h%w\ [%Y]\ [ASCII=\%03.3b\ HEX=\%02.2B]\ [POS=%04l,%04v\ %p%%\ of\ %L]\ %{ObsessionStatus('[tracking\ session]','[no\ session]')}
+" set statusline=%F%m%r%h%w\ [%Y]\ [ASCII=\%03.3b\ HEX=\%02.2B]\ [POS=%04l,%04v\ %p%%\ of\ %L]\ %{ObsessionStatus('[tracking\ session]','[no\ session]')}
 " set statusline=%F%m%r%h%w\ [%Y]\ [ASCII=\%03.3b\ HEX=\%02.2B]\ [POS=%04l,%04v\ %p%%\ of\ %L]
 
 set showmatch cursorline
