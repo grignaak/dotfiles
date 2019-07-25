@@ -93,10 +93,10 @@ nnoremap <leader>V `[v`]
 
 augroup file_types
   autocmd!
-  autocmd BufRead,BufNewFile *.rb :set sw=2 ts=2
-  autocmd BufRead,BufNewFile *.clj :set sw=2 ts=2 cindent
+  autocmd BufRead,BufNewFile *.rb :set shiftwidth=2 tabstop=2
+  autocmd BufRead,BufNewFile *.clj :set shiftwidth=2 tabstop=2 cindent
   autocmd BufRead,BufNewFile *.wiki :set foldlevel=2
-  autocmd BufRead,BufNewFile *.java :set tw=120
+  autocmd BufRead,BufNewFile *.java :set textwidth=120
 augroup END
 
 " }}}
@@ -105,9 +105,8 @@ augroup END
 
 augroup vim_type
   autocmd!
-  autocmd FileType vim :setlocal foldmethod=marker
-  autocmd FileType vim :setlocal sw=2 ts=2
-  autocmd FileType vim :foldclose!
+  autocmd FileType vim :setlocal foldmethod=marker foldlevelstart=0
+  autocmd FileType vim :setlocal shiftwidth=2 tabstop=2
 augroup END
 
 " }}}
@@ -122,7 +121,5 @@ let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 
 " }}}
-
-"echom ">^.^<"
 
 " vim: filetype=vim

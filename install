@@ -1,9 +1,8 @@
 #!/bin/bash
 
-vim_plugins=~/.vim/pack/my-plugins/start
-
-# Install each of the dotfiles
+# Install each of the dotfiles, which live under the (non-hidden) directories
+# (There is a hidden .git directory)
 find . -type d -mindepth 1 -maxdepth 1 | sed "s|^\./||" | xargs -I% stow %
 
-# The following installs the vim helpdocs without messing up the terminal (both mac and gnu xargs)
-find "$vim_plugins"  -type d -name doc | xargs -I% bash -c '</dev/tty vim --noplugin -u NONE -c "helptags %" -c q'
+# The following installs the vim helpdocs without messing up the terminal
+find ~/.vim/pack/my-plugins/start -type d -name doc -exec vim --noplugin -u NONE -c 'helptags {}' -c q \;
