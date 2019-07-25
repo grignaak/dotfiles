@@ -1,32 +1,27 @@
 " Modernize {{{
 " We aren't using typewriters any more
 
-source $VIMRUNTIME/defaults.vim
-
-" The above auto-jumps to last-known position. Turn that off.
-augroup vimStartup | autocmd! | augroup END
+" Note: a lot of settings are coming from vim-sensible
+" As an alternative, I can just include this trio of lines
+"   source $VIMRUNTIME/defaults.vim
+"   " The above auto-jumps to last-known position. Turn that off.
+"   augroup vimStartup | autocmd! | augroup END
 
 set nojoinspaces
 set nobackup noswapfile
-set nrformats-=octal
 set visualbell
 set matchpairs+=<:>
 
 " reading and writing buffers
 set autoread autowrite hidden
 
-set shiftwidth=4 tabstop=4 expandtab smarttab shiftround
+set shiftwidth=4 tabstop=4 expandtab shiftround
 
 " }}}
 
 " Plugins {{{
 
 set modeline modelines=5
-
-runtime macros/matchit.vim
-
-" session files don't need all the global options
-set sessionoptions-=options
 
 " }}} end plugins
 
@@ -47,14 +42,6 @@ if !has('packages')
   set statusline=%F%m%r%h%w\ [%Y]\ [ASCII=\%03.3b\ HEX=\%02.2B]\ [POS=%04l,%04v\ %p%%\ of\ %L]
 endif
 
-set scrolloff=1 sidescrolloff=5
-set display+=lastline
-
-" Allow color schemes to do bright colors without forcing bold.
-if &t_Co == 8 && $TERM !~# '^linux\|^Eterm'
-  set t_Co=16
-endif
-
 " }}} end display
 
 " Search {{{
@@ -63,15 +50,8 @@ endif
 noremap / /\v
 vnoremap / /\v
 
-set hlsearch incsearch
+set hlsearch
 set ignorecase smartcase
-
-" Use <C-L> to clear the highlighting of :set hlsearch.
-if maparg('<C-L>', 'n') ==# ''
-  nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
-endif
-
-set complete-=i
 
 " }}} end search
 
@@ -114,7 +94,7 @@ nnoremap <leader>V `[v`]
 augroup file_types
   autocmd!
   autocmd BufRead,BufNewFile *.rb :set sw=2 ts=2
-  autocmd BufRead,BufNewFile *.clj :set sw=2 ts=2 cindent autoindent
+  autocmd BufRead,BufNewFile *.clj :set sw=2 ts=2 cindent
   autocmd BufRead,BufNewFile *.wiki :set foldlevel=2
   autocmd BufRead,BufNewFile *.java :set tw=120
 augroup END
