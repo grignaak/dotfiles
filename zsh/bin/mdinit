@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -eu
+
+touchFile=/tmp/midway-init
+
+if [[ $(stat -f "%m" "$touchFile" 2>/dev/null) -lt $(date -j -v-8H +%s) ]]
+then
+    touch "$touchFile"
+
+    mwinit -o
+
+    ssh-add -D
+    ssh-add
+fi
+
