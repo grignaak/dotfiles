@@ -1,16 +1,71 @@
 #!/bin/bash
 
-set -eu
+set -eu -o pipefail
 
-touchFile=/tmp/midway-init
+OPTIONS=fv
+LONGOPTS=force,verbose,itar
 
-if [[ $(stat -f "%m" "$touchFile" 2>/dev/null) -lt $(date -j -v-8H +%s) ]]
-then
-    touch "$touchFile"
-
-    mwinit -o
-
-    ssh-add -D
-    ssh-add
+! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+    # getopt has already complained to stderr
+    exit 2
 fi
 
+# eval set gets the parameters into $@ correctly--even with spaces
+eval set -- "$PARSED"
+
+itar=n
+force=n
+verbose=n
+
+while true; do
+    case "$1" in
+        -f|--force)
+            force=y
+            shift
+            ;;
+        -v|--verbose)
+            verbose=y
+            shift
+            ;;
+        --itar)
+            itar=y
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo >&2 "Programming error: unknown parameter $1"
+            exit 255
+            ;;
+    esac
+done
+
+changed=n
+if [[ "$force" == y || $(stat -f "%m" ~/.midway/cookie 2>/dev/null) -lt $(date -j -v-8H +%s) ]]; then
+    echo "Commercial authentication: "
+    mwinit
+    ssh-add -D
+    ssh-add
+    changed=y
+fi
+
+if [[ "$itar" == y ]]; then
+    # Create symbolic links pointing to your id_rsa so that the certificate can be separated out. This
+    # will be skipped if you've set up a separate key.
+    if [[ ! -e ~/.ssh/itar_rsa ]]; then
+        ln -s ~/.ssh/id_rsa ~/.ssh/itar_rsa
+        ln -s ~/.ssh/id_rsa.pub ~/.ssh/itar_rsa.pub
+    fi
+
+    echo "ITAR authentication: "
+    mwinit --itar -k ~/.ssh/itar_rsa.pub -c ~/.ssh/itar_rsa-cert.pub
+    ssh-add ~/.ssh/itar_rsa
+    changed=y
+fi
+
+if [[ "$changed" == y ]]; then
+    scp ~/.midway/cookie mdearde2.aka.corp.amazon.com:~/.midway/cookie >/dev/null
+fi

@@ -21,6 +21,7 @@
     recent = log --pretty=format:'%h %ar |%C(red)%d%C(reset) %s [%an]' --graph --date=short --all -n 15 --since=1.month.ago
     type = cat-file -t
     dump = cat-file -p
+	stash-rename = "!_() { rev=$(git rev-parse $1) && git stash drop $1 || exit 1 ; git stash store -m \"$2\" $rev; }; _"
 [amazon]
     append-cr-url = true
     pull-request-by-default = false

@@ -8,3 +8,6 @@ annotation-generated-tst/
 *.DS_Store
 .gradle
 Session.vim
+tags
+var/
+configuration/rip-private/

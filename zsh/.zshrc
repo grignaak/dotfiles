@@ -18,7 +18,7 @@ setopt ZLE # usually this is default, making sure
 setopt NO_HUP # must type exit No Ctrl-D for you!
 setopt NO_FLOW_CONTROL # less likely to Ctrl-S freeze yourself
 setopt NO_BEEP
- 
+
 # nice globs
 setopt NO_CASE_GLOB
 setopt NUMERIC_GLOB_SORT
@@ -27,6 +27,8 @@ setopt EXTENDED_GLOB
 # I like vim the editor, but emacs on the cmd-line
 export EDITOR=vim
 bindkey -e
+
+eval $(thefuck --alias drat)
 
 #{{{ Prompt!
 
