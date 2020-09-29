@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# Print the log between two 
+# [Usage]
+# 
+#
+#
+
+set -eu -o pipefail
+
+print_usage() {
+    echo "script [rev] [rev]"
+    echo ""
+    echo "Print the graph between two revisions."
+    echo
+    echo "If only one revision is given then it must be a branch with an upstream;"
+    echo "the second revision is set to that upstream."
+    echo
+    echo "If no revisions are given then this acts as if just the branch at HEAD"
+    echo "was passed along with its upstream"
+}
+
+for arg in "$@"; do
+    case "$arg" in
+        --help|-h)
+            print_usage
+            exit 0
+            ;;
+    esac
+done
+
+deref() {
+    local ref=$(git show-ref "$1" | awk '{print $1}')
+    if [[ -z "$ref" ]]; then
+        echo "$1"
+    else
+        echo "$ref"
+    fi
+}
+
+count_parents() {
+    local -a parents=( $(git cat-file commit "$1" | head -3 | grep -o parent) )
+    echo "${#parents[@]}"
+}
+
+if [ "$#" -eq 0 ]; then
+    a=HEAD
+    b=$(git rev-parse HEAD@{upstream})
+elif [ "$#" -eq 1 ]; then
+    a="$1"
+    ! b=$(git rev-parse "$1@{upstream}" 2>/dev/null)
+    if [[ "${PIPESTATUS[0]}" -ne 0 ]]; then
+        echo >&2 "Cannot get upstrem of '$1' because it is is not a branch. You'll need to pass upstream as a second parameter"
+        echo >&2
+        print_usage >&2
+        exit 1
+    fi
+elif [[ "$#" -eq 2 ]]; then
+    a="$1"
+    b="$2"
+else
+    echo >&2 "Need at most two arguments"
+    exit 1
+fi
+
+a=$(deref "$a")
+b=$(deref "$b")
+
+if [[ "$a" = "$b" ]]; then
+    exit 0
+fi
+
+
+# [[ $(git rev-list --parents -n=1 "$a" | grep -o "$b") = "$b" || $(git rev-list --parents -n=1 "$b" | grep "$a") = "$a" ]]
+if [[ $(count_parents "$a") -eq 1 && $(count_parents "$b") -eq 1 ]]; then
+    head=$(git merge-base "$a" "$b") # This looks good for when one is in the path of the other
+fi
+head=$(git merge-base "$a~1" "$b~1") # This looks good for merges
+exec git log --color --pretty=format:'   %h %ar |%C(red)%d%C(reset) %s [%an]' --graph --date=short "${head}^!" "$a" "$b"

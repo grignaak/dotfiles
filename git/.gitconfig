@@ -36,3 +36,4 @@
     path = /Users/mdearde/bin/p4merge
 [git-town]
     offline = true
+	pull-branch-strategy = merge

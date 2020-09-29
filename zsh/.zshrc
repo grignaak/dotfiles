@@ -30,6 +30,8 @@ bindkey -e
 
 eval $(thefuck --alias drat)
 
+[ -f "$HOME/.local/share/mechanic/complete.zsh" ] && source "$HOME/.local/share/mechanic/complete.zsh"
+
 #{{{ Prompt!
 
 #TODO what are all these?
