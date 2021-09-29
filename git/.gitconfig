@@ -35,5 +35,7 @@
 [mergetool "p4merge"]
     path = /Users/mdearde/bin/p4merge
 [git-town]
-    offline = true
+	offline = false
 	pull-branch-strategy = merge
+	new-branch-push-flag = false
+	sync-upstream = false

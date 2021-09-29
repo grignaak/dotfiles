@@ -1,9 +1,11 @@
-generated
-generated_tests
-*.iml
-build
 annotation-generated-src/
 annotation-generated-tst/
+generated
+generated_tests
+generated-src/
+generated-tst/
+*.iml
+build
 *.sw*
 *.DS_Store
 .gradle

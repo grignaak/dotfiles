@@ -2,8 +2,10 @@
 
 set -eu -o pipefail
 
+DESKTOP=mdearde2.aka.corp.amazon.com
+
 OPTIONS=fv
-LONGOPTS=force,verbose,itar
+LONGOPTS=force,verbose,itar,cn,china,help
 
 ! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
@@ -14,12 +16,21 @@ fi
 # eval set gets the parameters into $@ correctly--even with spaces
 eval set -- "$PARSED"
 
+region=classic
 itar=n
 force=n
 verbose=n
 
 while true; do
     case "$1" in
+        --help)
+            echo "mdinit [--itar|--china] [--force]"
+            echo ""
+            echo "Initializes midway credentials and copies them to the desktop."
+            echo "It is expected that no region is supplied first, and then as a region is needed it is supplied individually."
+
+            exit 0
+            ;;
         -f|--force)
             force=y
             shift
@@ -28,8 +39,20 @@ while true; do
             verbose=y
             shift
             ;;
+        --cn|--china)
+            if [[ "$region" != classic && "$region" != china ]]; then
+                echo >&2 "Cannot mix different regions"
+                exit 2
+            fi
+            region=china
+            shift
+            ;;
         --itar)
-            itar=y
+            if [[ "$region" != classic ]]; then
+                echo >&2 "Cannot mix different regions"
+                exit 2
+            fi
+            region=itar
             shift
             ;;
         --)
@@ -44,17 +67,29 @@ while true; do
 done
 
 changed=n
-if [[ "$force" == y || $(stat -f "%m" ~/.midway/cookie 2>/dev/null) -lt $(date -j -v-8H +%s) ]]; then
-    echo "Commercial authentication: "
-    mwinit
-    ssh-add -D
-    ssh-add
-    changed=y
-fi
-
-if [[ "$itar" == y ]]; then
+if [[ "$region" == classic ]]; then
+    if [[ "$force" == y || $(stat -f "%m" ~/.midway/cookie 2>/dev/null) -lt $(date -j -v-8H +%s) ]]; then
+        echo "Commercial authentication: "
+        mwinit
+        ssh-add -D
+        ssh-add
+        changed=y
+    fi
+elif [[ "$region" == china ]]; then
     # Create symbolic links pointing to your id_rsa so that the certificate can be separated out. This
-    # will be skipped if you've set up a separate key.
+    # will be skipped if you've already set up a separate key.
+    if [[ ! -e ~/.ssh/cn_rsa ]]; then
+        ln -s ~/.ssh/id_rsa ~/.ssh/cn_rsa
+        ln -s ~/.ssh/id_rsa.pub ~/.ssh/cn_rsa.pub
+    fi
+
+    echo "CHINA authentication:"
+    mwinit --cn -k ~/.ssh/cn_rsa.pub -c ~/.ssh/cn_rsa-cert.pub
+    ssh-add ~/.ssh/cn_rsa
+    changed=y
+elif [[ "$region" == itar ]]; then
+    # Create symbolic links pointing to your id_rsa so that the certificate can be separated out. This
+    # will be skipped if you've already set up a separate key.
     if [[ ! -e ~/.ssh/itar_rsa ]]; then
         ln -s ~/.ssh/id_rsa ~/.ssh/itar_rsa
         ln -s ~/.ssh/id_rsa.pub ~/.ssh/itar_rsa.pub
@@ -67,5 +102,5 @@ if [[ "$itar" == y ]]; then
 fi
 
 if [[ "$changed" == y ]]; then
-    scp ~/.midway/cookie mdearde2.aka.corp.amazon.com:~/.midway/cookie >/dev/null
+    scp ~/.midway/cookie "$DESKTOP":~/.midway/cookie >/dev/null
 fi
