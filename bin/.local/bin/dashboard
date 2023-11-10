@@ -1,0 +1,28 @@
+#!/usr/local/bin/python3
+
+import random
+import sys
+
+dashboards = {
+    'index': 1000,
+
+    'archiver': 3,
+    'custodian': 3,
+
+    'validator': 1,
+    'index meta': 1,
+
+    'custodian jobs': 0.1,
+    'index low priority': 0.05,
+}
+
+def weighted_shuffle(weighted_items, k, rng=random):
+    # Efraimidis and Spiraki, https://arxiv.org/pdf/1012.0256.pdf
+    population = list(weighted_items.items())
+    order = sorted(population, key=lambda x: rng.random() ** (1 / x[1]))
+    order.reverse()
+    return [k for (k,w) in order[:k]]
+
+n = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+for dash in weighted_shuffle(dashboards, n):
+    print(dash)

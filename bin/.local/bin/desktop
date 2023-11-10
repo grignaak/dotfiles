@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+# change this via https://dns-manage-web.corp.proxy.amazon.com/cgi-bin/cname-editor.cgi
+DESKTOP=mdearde2.aka.corp.amazon.com
+
+if [[ "${#@}" == 1 && "$1" == print ]]; then
+  echo "$DESKTOP"
+  dig +short "$DESKTOP" | grep amazon
+else
+  mdinit --soft "$@"
+  exec ssh -A "$DESKTOP"
+fi

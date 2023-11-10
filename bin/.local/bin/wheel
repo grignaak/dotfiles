@@ -1,0 +1,42 @@
+#!/usr/local/bin/python3
+
+import argparse
+import random
+import sys
+
+projects = {
+    'work-distro': 'swancewi dimmers'.split(),
+    'turtle': 'egt linxiaok'.split(),
+    'metering': 'egt'.split(),
+    'metadata': 'egt swancewi'.split(),
+
+    'lunch': 'mbachani'.split(), # amended below
+    'devs': 'animepan nicktd dimmers egt linxiaok swancewi'.split(),
+}
+projects['lunch'].extend(projects['devs'])
+projects['lunch'].append('mdearde')
+
+def weighted_shuffle(weighted_items, k, rng=random):
+    # Efraimidis and Spiraki, https://arxiv.org/pdf/1012.0256.pdf
+    population = list(weighted_items.items())
+    order = sorted(population, key=lambda x: rng.random() ** (1 / x[1]))
+    order.reverse()
+    return [k for (k,w) in order[:k]]
+
+parser = argparse.ArgumentParser(description='Pick a random developer')
+parser.add_argument('project', choices=projects.keys(), default='devs')
+parser.add_argument('-n', metavar='N', type=int,
+        help="Maximum number of users to output")
+args = parser.parse_args()
+
+if not args.n:
+    args.n = 1 if args.project == 'lunch' else 2
+
+weighted_users = dict()
+for user in projects['devs']:
+    weighted_users[user] = 1
+for user in list(projects[args.project]):
+    weighted_users[user] = 20
+
+for user in weighted_shuffle(weighted_users, args.n):
+    print(user)

@@ -22,11 +22,12 @@
     type = cat-file -t
     dump = cat-file -p
 	stash-rename = "!_() { rev=$(git rev-parse $1) && git stash drop $1 || exit 1 ; git stash store -m \"$2\" $rev; }; _"
+	fr = status
 [amazon]
     append-cr-url = true
     pull-request-by-default = false
 [pull]
-    rebase = true
+	rebase = true
 [merge]
     tool = p4merge
 [mergetool]

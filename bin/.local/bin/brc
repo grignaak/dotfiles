@@ -1,0 +1,83 @@
+#!/bin/bash
+set -eu -o pipefail
+
+declare -r SHORTOPTS=p:,h
+declare -r LONGOPTS=all,start:,reverse,package:,clean,help
+
+! PARSED=$(getopt --options=$SHORTOPTS --longoptions=$LONGOPTS --name "$0" -- "$@")
+if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+    # getopt has alread complained to stderr
+    exit 2
+fi
+
+# eval set gets the parameters into $@ correctly--even with spaces
+eval set -- "$PARSED"
+
+declare -a OPTIONS=(--closure=run)
+while true; do
+    case "$1" in
+        --help|-h)
+            exec brazil-recursive-cmd --help
+            ;;
+        --start|--package|-p)
+            OPTIONS+=("$1")
+            shift
+            OPTIONS+=("$1")
+            shift
+            ;;
+        --reverse|--all)
+            OPTIONS+=("$1")
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+           echo >&2 "Programming error: unknown parameter $1"
+           exit 255
+           ;;
+   esac
+done
+
+declare BOLD="$(tput bold)$(tput setaf 3)"
+declare NORMAL=$(tput sgr0)
+
+declare DIV=$(printf -- "${BOLD}-%.0s${NORMAL}" {1..79})
+
+if [[ "$@" == "clean" ]]
+then
+    OPTIONS+=(--reverse)
+    eval set -- "brazil-build clean"
+elif [[ "$@" == print ]]
+then
+    for d in $(brazil-recursive-cmd "${OPTIONS[@]}" pwd)
+    do
+        echo $(basename "$d")
+    done
+    exit 0
+fi
+
+
+declare follow=n
+declare name
+for d in $(brazil-recursive-cmd "${OPTIONS[@]}" pwd)
+do
+    cd "$d"
+    name=$(basename "$d")
+
+    if [ $follow = y ];
+    then
+        echo
+    fi
+
+
+    echo $DIV
+    echo "${BOLD}${name}${NORMAL}"
+    echo $DIV
+
+    eval "$*"
+
+    follow=y
+done
+

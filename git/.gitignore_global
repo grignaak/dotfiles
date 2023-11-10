@@ -1,10 +1,14 @@
 annotation-generated-src/
 annotation-generated-tst/
+annotation-generated-src
+annotation-generated-tst
 generated
 generated_tests
 generated-src/
 generated-tst/
 *.iml
+.idea/
+out/
 build
 *.sw*
 *.DS_Store

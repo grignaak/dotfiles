@@ -2,10 +2,10 @@
 
 set -eu -o pipefail
 
-DESKTOP=mdearde2.aka.corp.amazon.com
+declare -r DESKTOP=mdearde2.aka.corp.amazon.com
 
-OPTIONS=fv
-LONGOPTS=force,verbose,itar,cn,china,help
+declare -r OPTIONS=v
+declare -r LONGOPTS=soft,verbose,itar,cn,china,copy,help,test
 
 ! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
@@ -16,23 +16,36 @@ fi
 # eval set gets the parameters into $@ correctly--even with spaces
 eval set -- "$PARSED"
 
-region=classic
-itar=n
-force=n
-verbose=n
+declare region=classic
+declare soft=n
+declare verbose=n
+declare copy=y
+declare testmode=n
 
 while true; do
     case "$1" in
+        --test)
+            testmode=y
+            shift
+            ;;
         --help)
-            echo "mdinit [--itar|--china] [--force]"
+            echo "mdinit [--itar|--china] [--soft] [--copy]"
             echo ""
             echo "Initializes midway credentials and copies them to the desktop."
-            echo "It is expected that no region is supplied first, and then as a region is needed it is supplied individually."
+            echo "It is expected that no region is supplied on the first run,"
+            echo "and then as a region is needed it is supplied individually."
+            echo ""
+            echo "--soft only auths after a time check since the last mdinit"
+            echo "       this is useful to put mdinit in scripts"
+            echo "--copy forces a copy of the cookie to the desktop"
 
             exit 0
             ;;
-        -f|--force)
-            force=y
+        --soft)
+            soft=y
+            shift
+            ;;
+        --copy)
             shift
             ;;
         -v|--verbose)
@@ -66,11 +79,12 @@ while true; do
     esac
 done
 
-changed=n
+declare changed=n
+
 if [[ "$region" == classic ]]; then
-    if [[ "$force" == y || $(stat -f "%m" ~/.midway/cookie 2>/dev/null) -lt $(date -j -v-8H +%s) ]]; then
+    if [[ "$soft" != y || $(stat -f "%m" ~/.midway/cookie 2>/dev/null) -lt $(date -j -v-8H +%s) ]]; then
         echo "Commercial authentication: "
-        mwinit
+        mwinit -s
         ssh-add -D
         ssh-add
         changed=y
@@ -99,6 +113,11 @@ elif [[ "$region" == itar ]]; then
     mwinit --itar -k ~/.ssh/itar_rsa.pub -c ~/.ssh/itar_rsa-cert.pub
     ssh-add ~/.ssh/itar_rsa
     changed=y
+fi
+
+if [[ "$copy" == y ]]; then
+  ssh "$DESKTOP" "mkdir -p ~/.midway/"
+  changed=y
 fi
 
 if [[ "$changed" == y ]]; then

@@ -32,7 +32,7 @@ function pathadd() {
     fi
 }
 
-pathadd $HOME/bin
+pathadd $HOME/.local/bin
 pathadd $HOME/.toolbox/bin
 pathadd /usr/local/lib/ruby/gems/2.6.0/bin/
 pathadd /usr/local/opt/ruby/bin
@@ -41,10 +41,12 @@ pathadd /usr/local/bin
 
 eval "$(jump shell zsh)"
 eval "$(direnv hook zsh)"
-eval $($(echo dGhlZnVjawo= | python -m base64 -d) --alias drat)
+eval $($(echo dGhlZnVjawo= | python3 -m base64 -d) --alias drat)
 
 export EDITOR=$(command -v nvim)
 export VISUAL="$EDITOR"
+
+export GPG_TTY=$(tty)
 
 [ -f "$HOME/.local/share/mechanic/complete.zsh" ] && source "$HOME/.local/share/mechanic/complete.zsh"
 

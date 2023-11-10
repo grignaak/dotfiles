@@ -1,0 +1,25 @@
+#!/bin/zsh
+
+# See https://w.amazon.com/bin/view/User/tmdav/TipsAndTricks/AeaRefresher/
+
+# for those who are off corp using mwinit --aea -s:
+# while the midway cookie lives for 20 hours, the aea cookie only lives for 2 hours
+# it's not necessary to re-enter midway credentials (password and security key) to refresh the aea cookie
+# credit to those on sage who have posted solutions that have inspired this one
+
+MWCOOKIE="$HOME/.midway/cookie"
+if [ ! -f $MWCOOKIE ]; then
+   echo "can't update $MWCOOKIE because the file doesn't exist."
+elif [ $(/usr/local/amazon/bin/acme_amazon_enterprise_access getAcmeDataLongLived | /usr/local/bin/jq -r '.Status') != "Success" ]; then
+   echo "unable to refresh aea cookie with long-lived acme data. please re-authenticate with midway."
+else
+   echo "refreshing aea cookie"
+   AEA_DATA=$(/usr/local/amazon/bin/acme_amazon_enterprise_access getAcmeDataLongLived | jq -r '.Jwt')
+   expires=$(($(date +%s) + 7200))
+   grep -v amazon_enterprise_access $MWCOOKIE > $MWCOOKIE.new
+   echo -e "#HttpOnly_.midway-auth.amazon.com\tTRUE\t/\tTRUE\t$expires\tamazon_enterprise_access\t$AEA_DATA" >> $MWCOOKIE.new
+   echo -e "#HttpOnly_.auth.midway.amazon.dev\tTRUE\t/\tTRUE\t$expires\tamazon_enterprise_access\t$AEA_DATA" >> $MWCOOKIE.new
+   echo -e "#HttpOnly_.auth.midway.aws.a2z.com\tTRUE\t/\tTRUE\t$expires\tamazon_enterprise_access\t$AEA_DATA" >> $MWCOOKIE.new
+   echo -e "#HttpOnly_.auth.midway.aws.dev\tTRUE\t/\tTRUE\t$expires\tamazon_enterprise_access\t$AEA_DATA" >> $MWCOOKIE.new  
+   mv $MWCOOKIE.new $MWCOOKIE
+fi
